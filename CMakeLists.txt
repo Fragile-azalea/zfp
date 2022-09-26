@@ -132,7 +132,7 @@ set_property(CACHE ZFP_ROUNDING_MODE PROPERTY STRINGS "ZFP_ROUND_NEVER;ZFP_ROUND
 
 option(ZFP_WITH_DAZ "Treat subnormals as zero to avoid overflow" OFF)
 
-option(ZFP_WITH_CUDA "Enable CUDA parallel compression" OFF)
+option(ZFP_WITH_CUDA "Enable CUDA parallel compression" ON)
 
 option(ZFP_WITH_BIT_STREAM_STRIDED "Enable strided access for progressive zfp streams" OFF)
 mark_as_advanced(ZFP_WITH_BIT_STREAM_STRIDED)
