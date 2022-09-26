@@ -111,7 +111,8 @@ size_t encode2launch(uint2 dims,
                      int2 stride,
                      const Scalar *d_data,
                      Word *stream,
-                     const int maxbits)
+                     const int maxbits,
+                     void *cuda_stream)
 {
   const int cuda_block_size = 128;
   dim3 block_size = dim3(cuda_block_size, 1, 1);
@@ -147,8 +148,8 @@ size_t encode2launch(uint2 dims,
   cudaEventCreate(&stop);
   cudaEventRecord(start);
 #endif
-
-  cudaEncode2<Scalar> <<<grid_size, block_size>>>
+  if (cuda_stream){
+    cudaEncode2<Scalar> <<<grid_size, block_size, 0, *((cudaStream_t *)cuda_stream)>>>
     (maxbits,
      d_data,
      stream,
@@ -156,6 +157,16 @@ size_t encode2launch(uint2 dims,
      stride,
      zfp_pad,
      zfp_blocks);
+  }else{
+    cudaEncode2<Scalar> <<<grid_size, block_size>>>
+    (maxbits,
+     d_data,
+     stream,
+     dims,
+     stride,
+     zfp_pad,
+     zfp_blocks);
+  }
 
 #ifdef CUDA_ZFP_RATE_PRINT
   cudaDeviceSynchronize();
@@ -179,9 +190,10 @@ size_t encode2(uint2 dims,
                int2 stride,
                Scalar *d_data,
                Word *stream,
-               const int maxbits)
+               const int maxbits,
+               void *cuda_stream)
 {
-  return encode2launch<Scalar>(dims, stride, d_data, stream, maxbits);
+  return encode2launch<Scalar>(dims, stride, d_data, stream, maxbits, cuda_stream);
 }
 
 }

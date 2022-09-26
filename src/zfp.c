@@ -113,24 +113,26 @@ zfp_field_alloc()
     field->nx = field->ny = field->nz = field->nw = 0;
     field->sx = field->sy = field->sz = field->sw = 0;
     field->data = 0;
+    field->cuda_stream = 0;
   }
   return field;
 }
 
 zfp_field*
-zfp_field_1d(void* data, zfp_type type, size_t nx)
+zfp_field_1d(void* data, zfp_type type, size_t nx, void* cuda_stream = 0)
 {
   zfp_field* field = zfp_field_alloc();
   if (field) {
     field->type = type;
     field->nx = nx;
     field->data = data;
+    field->cuda_stream = cuda_stream;
   }
   return field;
 }
 
 zfp_field*
-zfp_field_2d(void* data, zfp_type type, size_t nx, size_t ny)
+zfp_field_2d(void* data, zfp_type type, size_t nx, size_t ny, void* cuda_stream = 0)
 {
   zfp_field* field = zfp_field_alloc();
   if (field) {
@@ -138,12 +140,13 @@ zfp_field_2d(void* data, zfp_type type, size_t nx, size_t ny)
     field->nx = nx;
     field->ny = ny;
     field->data = data;
+    field->cuda_stream = cuda_stream;
   }
   return field;
 }
 
 zfp_field*
-zfp_field_3d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz)
+zfp_field_3d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz, void* cuda_stream = 0)
 {
   zfp_field* field = zfp_field_alloc();
   if (field) {
@@ -152,12 +155,13 @@ zfp_field_3d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz)
     field->ny = ny;
     field->nz = nz;
     field->data = data;
+    field->cuda_stream = cuda_stream;
   }
   return field;
 }
 
 zfp_field*
-zfp_field_4d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz, size_t nw)
+zfp_field_4d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz, size_t nw, void* cuda_stream = 0)
 {
   zfp_field* field = zfp_field_alloc();
   if (field) {
@@ -167,6 +171,7 @@ zfp_field_4d(void* data, zfp_type type, size_t nx, size_t ny, size_t nz, size_t 
     field->nz = nz;
     field->nw = nw;
     field->data = data;
+    field->cuda_stream = cuda_stream;
   }
   return field;
 }

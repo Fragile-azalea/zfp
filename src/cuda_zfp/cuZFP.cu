@@ -98,7 +98,7 @@ bool is_contigous(const uint dims[3], const int3 &stride, long long int &offset)
 // encode expects device pointers
 //
 template<typename T>
-size_t encode(uint dims[3], int3 stride, int bits_per_block, T *d_data, Word *d_stream)
+size_t encode(uint dims[3], int3 stride, int bits_per_block, T *d_data, Word *d_stream, void *cuda_stream)
 {
 
   int d = 0;
@@ -126,7 +126,7 @@ size_t encode(uint dims[3], int3 stride, int bits_per_block, T *d_data, Word *d_
     int2 s;
     s.x = stride.x; 
     s.y = stride.y; 
-    stream_size = cuZFP::encode2<T>(ndims, s, d_data, d_stream, bits_per_block); 
+    stream_size = cuZFP::encode2<T>(ndims, s, d_data, d_stream, bits_per_block, cuda_stream); 
   }
   else if(d == 3)
   {
@@ -382,22 +382,22 @@ cuda_compress(zfp_stream *stream, const zfp_field *field)
   if(field->type == zfp_type_float)
   {
     float* data = (float*) d_data;
-    stream_bytes = internal::encode<float>(dims, stride, (int)stream->maxbits, data, d_stream);
+    stream_bytes = internal::encode<float>(dims, stride, (int)stream->maxbits, data, d_stream, field->cuda_stream);
   }
   else if(field->type == zfp_type_double)
   {
     double* data = (double*) d_data;
-    stream_bytes = internal::encode<double>(dims, stride, (int)stream->maxbits, data, d_stream);
+    stream_bytes = internal::encode<double>(dims, stride, (int)stream->maxbits, data, d_stream, field->cuda_stream);
   }
   else if(field->type == zfp_type_int32)
   {
     int * data = (int*) d_data;
-    stream_bytes = internal::encode<int>(dims, stride, (int)stream->maxbits, data, d_stream);
+    stream_bytes = internal::encode<int>(dims, stride, (int)stream->maxbits, data, d_stream, field->cuda_stream);
   }
   else if(field->type == zfp_type_int64)
   {
     long long int * data = (long long int*) d_data;
-    stream_bytes = internal::encode<long long int>(dims, stride, (int)stream->maxbits, data, d_stream);
+    stream_bytes = internal::encode<long long int>(dims, stride, (int)stream->maxbits, data, d_stream, field->cuda_stream);
   }
 
   internal::cleanup_device_ptr(stream->stream->begin, d_stream, stream_bytes, 0, field->type);

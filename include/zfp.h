@@ -133,6 +133,7 @@ typedef struct {
   size_t nx, ny, nz, nw;    /* sizes (zero for unused dimensions) */
   ptrdiff_t sx, sy, sz, sw; /* strides (zero for contiguous array a[nw][nz][ny][nx]) */
   void* data;               /* pointer to array data */
+  void* cuda_stream;
 } zfp_field;
 
 #ifdef __cplusplus
@@ -380,7 +381,8 @@ zfp_field*       /* allocated field metadata */
 zfp_field_1d(
   void* pointer, /* pointer to uncompressed scalars (may be NULL) */
   zfp_type type, /* scalar type */
-  size_t nx      /* number of scalars */
+  size_t nx,     /* number of scalars */
+  void* cuda_stream
 );
 
 /* allocate metadata for 2D field f[ny][nx] */
@@ -389,7 +391,8 @@ zfp_field_2d(
   void* pointer, /* pointer to uncompressed scalars (may be NULL) */
   zfp_type type, /* scalar type */
   size_t nx,     /* number of scalars in x dimension */
-  size_t ny      /* number of scalars in y dimension */
+  size_t ny,     /* number of scalars in y dimension */
+  void* cuda_stream
 );
 
 /* allocate metadata for 3D field f[nz][ny][nx] */
@@ -399,7 +402,8 @@ zfp_field_3d(
   zfp_type type, /* scalar type */
   size_t nx,     /* number of scalars in x dimension */
   size_t ny,     /* number of scalars in y dimension */
-  size_t nz      /* number of scalars in z dimension */
+  size_t nz,     /* number of scalars in z dimension */
+  void* cuda_stream
 );
 
 /* allocate metadata for 4D field f[nw][nz][ny][nx] */
@@ -410,7 +414,8 @@ zfp_field_4d(
   size_t nx,     /* number of scalars in x dimension */
   size_t ny,     /* number of scalars in y dimension */
   size_t nz,     /* number of scalars in z dimension */
-  size_t nw      /* number of scalars in w dimension */
+  size_t nw,     /* number of scalars in w dimension */
+  void* cuda_stream
 );
 
 /* deallocate field metadata */
