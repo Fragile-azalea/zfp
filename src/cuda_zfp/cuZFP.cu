@@ -144,7 +144,7 @@ size_t encode(uint dims[3], int3 stride, int bits_per_block, T *d_data, Word *d_
 }
 
 template<typename T>
-size_t decode(uint ndims[3], int3 stride, int bits_per_block, Word *stream, T *out)
+size_t decode(uint ndims[3], int3 stride, int bits_per_block, Word *stream, T *out, void *cuda_stream)
 {
 
   int d = 0;
@@ -188,7 +188,7 @@ size_t decode(uint ndims[3], int3 stride, int bits_per_block, Word *stream, T *o
     s.x = stride.x; 
     s.y = stride.y; 
 
-    stream_bytes = cuZFP::decode2<T>(dims, s, stream, out, bits_per_block); 
+    stream_bytes = cuZFP::decode2<T>(dims, s, stream, out, bits_per_block, cuda_stream); 
   }
   else std::cerr<<" d ==  "<<d<<" not implemented\n";
  
@@ -441,25 +441,25 @@ cuda_decompress(zfp_stream *stream, zfp_field *field)
   if(field->type == zfp_type_float)
   {
     float *data = (float*) d_data;
-    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data);
+    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data, field->cuda_stream);
     d_data = (void*) data;
   }
   else if(field->type == zfp_type_double)
   {
     double *data = (double*) d_data;
-    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data);
+    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data, field->cuda_stream);
     d_data = (void*) data;
   }
   else if(field->type == zfp_type_int32)
   {
     int *data = (int*) d_data;
-    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data);
+    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data, field->cuda_stream);
     d_data = (void*) data;
   }
   else if(field->type == zfp_type_int64)
   {
     long long int *data = (long long int*) d_data;
-    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data);
+    decoded_bytes = internal::decode(dims, stride, (int)stream->maxbits, d_stream, data, field->cuda_stream);
     d_data = (void*) data;
   }
   else

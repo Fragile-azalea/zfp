@@ -99,7 +99,8 @@ size_t decode2launch(uint2 dims,
                      int2 stride,
                      Word *stream,
                      Scalar *d_data,
-                     uint maxbits)
+                     uint maxbits,
+                     void *cuda_stream)
 {
   const int cuda_block_size = 128;
   dim3 block_size;
@@ -137,13 +138,23 @@ size_t decode2launch(uint2 dims,
   cudaEventRecord(start);
 #endif
 
-  cudaDecode2<Scalar, 16> << < grid_size, block_size >> >
-    (stream,
-		 d_data,
-     dims,
-     stride,
-     zfp_pad,
-     maxbits);
+  if (cuda_stream) {
+    cudaDecode2<Scalar, 16> << < grid_size, block_size, 0, *((cudaStream_t *)cuda_stream) >> >
+      (stream,
+      d_data,
+      dims,
+      stride,
+      zfp_pad,
+      maxbits);
+  } else {
+    cudaDecode2<Scalar, 16> << < grid_size, block_size >> >
+      (stream,
+      d_data,
+      dims,
+      stride,
+      zfp_pad,
+      maxbits);
+  }
 
 #ifdef CUDA_ZFP_RATE_PRINT
   cudaEventRecord(stop);
@@ -168,9 +179,10 @@ size_t decode2(uint2 dims,
                int2 stride,
                Word *stream,
                Scalar *d_data,
-               uint maxbits)
+               uint maxbits,
+               void *cuda_stream)
 {
-	return decode2launch<Scalar>(dims, stride, stream, d_data, maxbits);
+	return decode2launch<Scalar>(dims, stride, stream, d_data, maxbits, cuda_stream);
 }
 
 } // namespace cuZFP
